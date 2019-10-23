@@ -57,19 +57,25 @@ function sysCall_init()
     
     x_limit = {-8.5, 8.5}
     y_limit = {-9, 9} 
+    z_limit = {0, 4}
     
-    --Start x = -9 y = -9 z = 2.5    
+    --Start x = -8.5 y = -9 z = 4   
     START = true
     v_start = 0.02
+    x = -8.5
+    y = -9
+    z = 4
     
     --Search
     SEARCH = false
     vx_search = 0.1
     x_enable = true
+    boss = false
 
-    vy_search = 0.02
+    vy_search = 0.04
     y_enable = false
     y_control = 0
+    
 end
 
 function sysCall_cleanup() 
@@ -86,6 +92,47 @@ function sysCall_actuation()
         itemData={pos[1],pos[2],0.002,0,0,1,0.2*s}
         sim.addDrawingObjectItem(shadowCont,itemData)
     end
+
+    if (SEARCH) then
+        pos = sim.getObjectPosition(targetObj,-1)
+        x = pos[1]
+        y = pos[2]
+        z = pos[3]
+        if (x_enable) then
+            if (x < x_limit[1] and vx_search < 0) then
+                vx_search = vx_search * (-1)
+                x_enable = false
+                y_enable = true
+            end
+            if (x > x_limit[2] and vx_search > 0) then
+                vx_search = vx_search * (-1)
+                x_enable = false
+                y_enable = true
+            end
+            
+            if (x > -6 and x < 6 and not boss) then
+                boss = true
+                vx_search = vx_search * 2.5
+            else
+                if (x <= -6 or x >= 6 and boss) then
+                    boss = false
+                    vx_search = vx_search > 0 and 0.1 or -0.1 
+                end
+            end
+            x = x + vx_search
+        end
+        if (y_enable) then
+            y = y + vy_search
+            y_control = y_control + 1
+            print(y_control)
+            if (y_control >= 50) then
+                y_control = 0
+                y_enable = false
+                x_enable = true
+            end
+        end
+        sim.setObjectPosition(targetObj, -1, {x, y, z})
+    end
     
     if (START) then
         pos = sim.getObjectPosition(targetObj,-1)
@@ -97,47 +144,19 @@ function sysCall_actuation()
             sim.setObjectPosition(targetObj, -1, {pos[1], pos[2]-v_start, pos[3]})
         end
         pos = sim.getObjectPosition(targetObj,-1)
-        if (pos[3] < 2.5) then
+        if (pos[3] < z_limit[2]) then
             sim.setObjectPosition(targetObj, -1, {pos[1], pos[2], pos[3]+v_start})
         end
         pos = sim.getObjectPosition(targetObj,-1)
-        if (pos[1] <= x_limit[1] and pos[2] <= y_limit[1] and pos[3] >= 2.5) then
+        if (pos[1] <= x_limit[1] and pos[2] <= y_limit[1] and pos[3] >= z_limit[2]) then
             START = false
+            SEARCH = true
         end
     end
 
-    if (SEARCH) then
-        pos = sim.getObjectPosition(targetObj,-1)
-        x = pos[1]
-        y = pos[2]
-        z = pos[3]
-        print(x_enable)
-        if (x_enable) then
-            print("Valor de x ", x)
-
-            if (x < x_limit[1] and vx_search < 0) then
-                vx_search = vx_search * (-1)
-                x_enable = false
-                y_enable = true
-            end
-            if (x > x_limit[2] and vx_search > 0) then
-                vx_search = vx_search * (-1)
-                x_enable = false
-                y_enable = true
-            end
-            x = x + vx_search
-        end
-        if (y_enable) then
-            y = y + vy_search
-            y_control = y_control + 1
-            if (y_control == 30) then
-                y_control = 0
-                y_enable = false
-                x_enable = true
-            end
-        end
-        print({x, y, z})
-        sim.setObjectPosition(targetObj, -1, {x, y, z})
+    if (SEARCH and x >= 8 and y >= 8) then
+        print("ENTROU")
+        SEARCH = false
     end
 
     -- Vertical control:
@@ -182,9 +201,5 @@ function sysCall_actuation()
     -- Send the desired motor velocities to the 4 rotors:
     for i=1,4,1 do
         sim.setScriptSimulationParameter(propellerScripts[i],'particleVelocity',particlesTargetVelocities[i])
-    end
-    
-    if (not START) then
-        SEARCH = true
     end
 end 
