@@ -33,6 +33,7 @@
 
 ## Documentation
 - **Quadricopter**
+    - Represents the drone with its respective attributes and sensors.
 
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
@@ -71,6 +72,7 @@
 | zMax                 | float     | Maximum coordinate that the map displays             |               |
 
 - **VisionSensor**
+    - Responsible for quadcopter vision
 
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
@@ -86,6 +88,7 @@
 | getPositionObject    | image - Array of the captured image  <br> refObj - Object value reference in vision sensor   | Get the object position of the vision sensor                      | Return an array with orientation and direction respectively |
 
 - **TargetControl**
+    - Object responsible for move the quadricopter. Him works like a control remote. 
 
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
@@ -98,6 +101,7 @@
 | setPosition          | x, y, z   | Set the target position                              |  |
 
 - **SonarSensor**
+    - Responsible for detect colision of the quadricopter. Proximity sensor.
 
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
