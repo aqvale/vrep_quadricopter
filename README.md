@@ -33,19 +33,6 @@
 
 ## Documentation
 - ** Quadricopter  **
-| Atribute             | Type      |                Description                           | Default value |
-|:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
-| _serverIp            | str       | Address ip of the server remote                      | '127.0.0.1'   |
-| _serverPort          | int       | Port of the server remote                            | 19999         |
-| _refObj              | int       | Object value reference in vision sensor              |               |
-| _clientID            | int       | Id of the client with api remote                     | |
-| target               | object    | Target that control the quadricopter                 | |
-| vision               | object    | Vision that get image                                | |
-| sonar                | object    | Responsible for detecting collision when landing     | |
-| vMin                 | float     | Minimum speed while searching. This value can be changed during application execution. | 0.1 |
-| _objFound            | bool      | State object found                                   | |
-| msg                  | str       | Mensage of the quadricopter                          | |
-
 | Method               | Parameters|                Description                           |        Return                    |
 |:--------------------:|:---------:|:----------------------------------------------------:|:--------------------------------:|
 | _createTargetControl |           | Get object handle that control quadcopter            | Object with handle to control Target      |
