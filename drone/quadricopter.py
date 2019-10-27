@@ -1,21 +1,7 @@
-from util import vrep
 import time
 
-class SceneMap():
-    xMin = None
-    xMax = None
-    yMin = None
-    yMax = None
-    zMin = None
-    zMax = None
-
-    def __init__(self, xMin, xMax, yMin, yMax, zMin, zMax):
-        self.xMin = xMin
-        self.xMax = xMax
-        self.yMin = yMin
-        self.yMax = yMax
-        self.zMin = zMin
-        self.zMax = zMax
+from util import vrep
+from scene.scene_map import SceneMap
 
 class Quadricopter():
     _serverIp   = None
@@ -102,9 +88,8 @@ class Quadricopter():
                 else:
                     if (x <= sMap.xMin+1 or x >= sMap.xMax-1 and boss):
                         boss = False
-                v = self.vMin*3 if boss else self.vMin
+                v = self.vMin*4 if boss else self.vMin
                 x = x + v
-            
             if yEnable:
                 y = y + 0.1
                 y_control = y_control + 1
@@ -141,6 +126,10 @@ class Quadricopter():
                 
                 if orientation == 0 or direction == 0:
                     height = -0.01
+
+                if z <= sMap.zMax/2:
+                    height = height*10
+                    self.vMin = self.vMin/10
                 
                 if not self.sonar.getStateColision():
                     self.target.setPosition((x+orientation), (y+direction), (z+height))
@@ -156,6 +145,7 @@ class Quadricopter():
             
             if notFound > 500:
                 self.msg = "Lose object"
+                self.vMin = self.vMin * 10
                 return False
             time.sleep(0.15)
 
@@ -235,7 +225,7 @@ class Quadricopter():
             
             if control == 0:
                 return [-1, -1]
-            elif control >= ((self.line/2) -1) and control <= self.line/2:
+            elif control >= ((self.line/2) -4) and control <= self.line/2:
                 return [orientation, 0] 
             elif control <= self.line/2:
                 return [orientation, -v]
