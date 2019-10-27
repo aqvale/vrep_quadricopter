@@ -27,12 +27,13 @@
   - Git `clone` this repo or download as a ZIP and extract
   - Run `python main.py`
 
-- ** Configuration  ** ⚙️
+- **Configuration** ⚙️
 
   - To run `quadricopter-py` on other operating systems you need to replace the `remote_api.so` located in the folder `../V-REP_PRO_EDU_V3_6_2/programming/remoteApiBindings/lib/lib`.
 
 ## Documentation
-- ** Quadricopter  ** <br>
+- **Quadricopter**
+
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
 | _serverIp            | str       | Address ip of the server remote                      | '127.0.0.1'   |
@@ -57,9 +58,9 @@
 | searchObj            | sMap - Object Scene Map | Search the object in the map | |
 | land                 | sMap - Object Scene Map | Centers the quadricopter with the object | True if found sucess it and false if lose the object |
 
-- ** SceneMap  **
+- **SceneMap**
+    - Fundamental for define the limits of the quadricopter simpler.
 
-- Fundamental for define the limits of the quadricopter simpler.
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
 | xMin                 | float     | Minimum coordinate that the map displays             |               |
@@ -69,7 +70,7 @@
 | zMin                 | float     | Minimum coordinate that the map displays             |               |
 | zMax                 | float     | Maximum coordinate that the map displays             |               |
 
-- ** VisionSensor  **
+- **VisionSensor**
 
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
@@ -84,7 +85,7 @@
 | getImage             |           | Get imagem of the vision sensor                      | Return an array with view values       |
 | getPositionObject    | image - Array of the captured image  <br> refObj - Object value reference in vision sensor   | Get the object position of the vision sensor                      | Return an array with orientation and direction respectively |
 
-- ** TargetControl  **
+- **TargetControl**
 
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
@@ -96,12 +97,12 @@
 | getPosition          |           | Get the target position                              | Return the coordinate of the target x, y, z |
 | setPosition          | x, y, z   | Set the target position                              |  |
 
-- ** SonarSensor  **
+- **SonarSensor**
+
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
 | id                   | int       | Get object handle sonar  sensor                      |    |
 | _clientID            | int       | Id of the client with api remote                     |    | 
-
 
 | Method               | Parameters|                Description                           |        Return                    |
 |:--------------------:|:---------:|:----------------------------------------------------:|:--------------------------------:|
