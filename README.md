@@ -1,4 +1,4 @@
-# Quadricopter.py Vrep 🤖 🌟
+# Quadricopter.py Vrep 🤖 🌟 🚀
 
 **Vrep** The robot simulator [V-REP](http://www.coppeliarobotics.com/), with integrated development environment, is based on a distributed control architecture: each object/model can be individually controlled via an embedded script, a plugin, a ROS or BlueZero node, a remote API client, or a custom solution. This makes V-REP very versatile and ideal for multi-robot applications. Controllers can be written in C/C++, Python, Java, Lua, Matlab or Octave. 
 
@@ -10,7 +10,7 @@
 - V-REP 3.6.2 or greater
 - Linux 64x
 
-## Quick Start 🚀
+## Quick Start 🏁
 
 - **Make sure you have Python 3.6 or above installed**
 
@@ -22,7 +22,7 @@
   - install [pyenv](https://mrdjangoblog.wordpress.com/2016/08/18/installing-pyenv-python-3-5/)
   - `pyenv install 3.6.0`
 
-- **How to install** 🏁
+- **How to install** 
 
   - Git `clone` this repo or download as a ZIP and extract
   - Run `python main.py`
