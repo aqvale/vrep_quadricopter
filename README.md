@@ -32,7 +32,20 @@
   - To run `quadricopter-py` on other operating systems you need to replace the `remote_api.so` located in the folder `../V-REP_PRO_EDU_V3_6_2/programming/remoteApiBindings/lib/lib`.
 
 ## Documentation
-- ** Quadricopter  **
+- ** Quadricopter  ** <br>
+| Atribute             | Type      |                Description                           | Default value |
+|:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
+| _serverIp            | str       | Address ip of the server remote                      | '127.0.0.1'   |
+| _serverPort          | int       | Port of the server remote                            | 19999         |
+| _refObj              | int       | Object value reference in vision sensor              |               |
+| _clientID            | int       | Id of the client with api remote                     | |
+| target               | object    | Target that control the quadricopter                 | |
+| vision               | object    | Vision that get image                                | |
+| sonar                | object    | Responsible for detecting collision when landing     | |
+| vMin                 | float     | Minimum speed while searching. This value can be changed during application execution. | 0.1 |
+| _objFound            | bool      | State object found                                   | |
+| msg                  | str       | Mensage of the quadricopter                          | |
+
 | Method               | Parameters|                Description                           |        Return                    |
 |:--------------------:|:---------:|:----------------------------------------------------:|:--------------------------------:|
 | _createTargetControl |           | Get object handle that control quadcopter            | Object with handle to control Target      |
@@ -45,6 +58,7 @@
 | land                 | sMap - Object Scene Map | Centers the quadricopter with the object | True if found sucess it and false if lose the object |
 
 - ** SceneMap  **
+
 - Fundamental for define the limits of the quadricopter simpler.
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
@@ -56,6 +70,7 @@
 | zMax                 | float     | Maximum coordinate that the map displays             |               |
 
 - ** VisionSensor  **
+
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
 | id                   | int       | Get object handle vision sensor                      |    |
@@ -64,18 +79,17 @@
 | line                 | int       | Vector line representing a matrix line               | |
 | half                 | int       | Divide the image into two parts                      | |  
 
-
 | Method               | Parameters|                Description                           |        Return                    |
 |:--------------------:|:---------:|:----------------------------------------------------:|:--------------------------------:|
 | getImage             |           | Get imagem of the vision sensor                      | Return an array with view values       |
 | getPositionObject    | image - Array of the captured image  <br> refObj - Object value reference in vision sensor   | Get the object position of the vision sensor                      | Return an array with orientation and direction respectively |
 
 - ** TargetControl  **
+
 | Atribute             | Type      |                Description                           | Default value |
 |:--------------------:|:---------:|:----------------------------------------------------:|:-------------:|
 | id                   | int       | Get object handle vision sensor                      |    |
 | _clientID            | int       | Id of the client with api remote                     | | 
-
 
 | Method               | Parameters|                Description                           |        Return                    |
 |:--------------------:|:---------:|:----------------------------------------------------:|:--------------------------------:|
