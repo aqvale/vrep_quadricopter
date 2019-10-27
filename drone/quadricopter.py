@@ -1,7 +1,7 @@
 from util import vrep
 import time
 
-class ScenaMap():
+class SceneMap():
     xMin = None
     xMax = None
     yMin = None
@@ -26,7 +26,7 @@ class Quadricopter():
     vision      = None
     vMin        = None
 
-    _objFound   = False
+    _objFound   = None
     msg         = ''
 
     def __init__(self, _serverIp, _serverPort, refObj, vMin:float = 0.1):
@@ -50,7 +50,7 @@ class Quadricopter():
     def _finishServer(self):
         vrep.simxFinish(self._clientID)
 
-    def startPosition(self, vStart, sMap: ScenaMap):
+    def startPosition(self, vStart, sMap: SceneMap):
         pos = self.target.getPosition()
         x = sMap.xMin
         y = sMap.yMin
@@ -75,38 +75,33 @@ class Quadricopter():
             
             pos = self.target.getPosition()
             
-    def searchObj(self, sMap: ScenaMap):
+    def searchObj(self, sMap: SceneMap):
         v = 0
+        y_control = 0
         xEnable = True
         yEnable = False
         boss = False
         while vrep.simxGetConnectionId(self._clientID) != -1:
             x, y, z = self.target.getPosition()
-            if x >= (sMap.xMax -1) and y >= (sMap.yMax - 1):
+            if x >= (sMap.xMin) and y >= (sMap.yMax):
                 break 
             
             if xEnable:
-                if (x < sMap.xMin and self.vMin < 0):
+                if (x < sMap.xMin and self.vMin < 0) or (x > sMap.xMax and self.vMin > 0):
                     self.vMin = self.vMin * (-1)
                     xEnable = False
                     yEnable = True
                 
-                if (x > sMap.xMax and self.vMin > 0):
-                    self.vMin = self.vMin * (-1)
-                    xEnable = False
-                    yEnable = True
-                
-                if (x > -7 and x < 7 and not boss):
+                if (x > sMap.xMin+1 and x < sMap.xMax-1 and not boss):
                     boss = True
-                    v = self.vMin * 3
                 else:
-                    if (x <= -7 or x >= 7 and boss):
+                    if (x <= sMap.xMin+1 or x >= sMap.xMax-1 and boss):
                         boss = False
-                        v = self.vMin if self.vMin > 0 else -self.vMin 
+                v = self.vMin*3 if boss else self.vMin
                 x = x + v
             
             if yEnable:
-                y = y + abs(self.vMin)
+                y = y + 0.1
                 y_control = y_control + 1
                 if (y_control >= 45):
                     y_control = 0
@@ -118,10 +113,12 @@ class Quadricopter():
             image = self.vision.getImage()
             if self._refObj in image:
                 self._objFound = True
-                return True
-        return False
-    
-    def land(self, sMap: ScenaMap):
+                self.vMin = self.vMin/100
+                return
+        self._objFound = False
+        self.msg = 'Object not found!'
+
+    def land(self, sMap: SceneMap):
         height = 0
         notFound = 0
         while True:
@@ -134,11 +131,11 @@ class Quadricopter():
             orientation, direction = self.vision.getPositionObject(image, self._refObj)
             if orientation != -1 and direction != -1:
                 if orientation == 0 and direction == 0:
-                    self.msg = "Find the object! Object center, he is below"
+                    self.msg = "Find the object! He is below."
                     return True 
                 
                 if orientation == 0 or direction == 0:
-                    height = -0.1
+                    height = -0.05
                 
                 self.target.setPosition((x+orientation), (y+direction), (z+height))
                 height = 0
@@ -147,29 +144,37 @@ class Quadricopter():
                 self.target.setPosition((x-self.vMin), y, z)
                 notFound += 1
             
-            if notFound > 20:
+            if notFound > 200:
                 self.msg = "Lose object"
                 return False
             time.sleep(0.15)
 
     class VisionSensor():
-        vSensor     = None
-        resolution  = None
+        id          = None
         _clientID   = None
+        resolution  = None
+        line        = None
+        half        = None
+
 
         def __init__(self, clientID):
-            self.vSensor = vrep.simxGetObjectHandle(clientID, 'Vision_sensor', vrep.simx_opmode_blocking)[1]
+            self.id = vrep.simxGetObjectHandle(clientID, 'Vision_sensor', vrep.simx_opmode_blocking)[1]
             self._clientID = clientID
+            vrep.simxGetVisionSensorImage(clientID, self.id, 0, vrep.simx_opmode_streaming)
+            time.sleep(1)
 
         def getImage(self):
-            error, self.resolution, image = vrep.simxGetVisionSensorImage(self._clientID, self.vSensor, 0, vrep.simx_opmode_buffer)
-            return image
+            if not self.resolution:
+                error, res, image = vrep.simxGetVisionSensorImage(self._clientID, self.id, 0, vrep.simx_opmode_buffer)
+                self.resolution = res[0]
+                self.line = self.resolution * 3
+                self.half = int(self.line*self.resolution/2)
+                return image
+            return vrep.simxGetVisionSensorImage(self._clientID, self.id, 0, vrep.simx_opmode_buffer)[2]
 
         def getPositionObject(self, image, refObj) -> list:
-            line = self.resolution * 3
-            front = image[line*self.resolution/2:]
-            back = image[:line*self.resolution/2]
-            
+            front = image[self.half:]
+            back = image[:self.half]
             control = 0
             direction = None
             searched = 0
@@ -187,7 +192,7 @@ class Quadricopter():
                     else:
                         searched = 0
                     
-                    if control == line:
+                    if control == self.line:
                         control = 0
                         searched = 0
                     
@@ -209,7 +214,7 @@ class Quadricopter():
                     else:
                         searched = 0
                     
-                    if control == line:
+                    if control == self.line:
                         control = 0
                         searched = 0
                     
@@ -220,23 +225,25 @@ class Quadricopter():
             
             if control == 0:
                 return [-1, -1]
-            elif control >= ((line/2) -1) and control <= line/2:
+            elif control >= ((self.line/2) -1) and control <= self.line/2:
                 return [direction, 0] 
-            elif control <= line/2:
+            elif control <= self.line/2:
                 return [direction, -v]
             else:
                 return [direction, v]   
 
     class TargetControl():
-        targetObj  = None
+        id         = None
         _clientID  = None
         
         def __init__(self, clientID):
-            self.targetObj = vrep.simxGetObjectHandle(clientID, 'Quadricopter_target', vrep.simx_opmode_blocking)[1]
+            self.id = vrep.simxGetObjectHandle(clientID, 'Quadricopter_target', vrep.simx_opmode_blocking)[1]
             self._clientID = clientID
+            vrep.simxGetObjectPosition(self._clientID, self.id, -1, vrep.simx_opmode_streaming)
+            time.sleep(1)
 
         def getPosition(self):
-            return vrep.simxGetObjectPosition(self._clientID, self.targetObj, -1, vrep.simx_opmode_buffer)[1]
+            return vrep.simxGetObjectPosition(self._clientID, self.id, -1, vrep.simx_opmode_buffer)[1]
 
         def setPosition(self, x, y, z):
-            vrep.simxSetObjectPosition(self._clientID, self.targetObj, -1, [x, y, z], vrep.simx_opmode_oneshot)
+            vrep.simxSetObjectPosition(self._clientID, self.id, -1, [x, y, z], vrep.simx_opmode_oneshot)
